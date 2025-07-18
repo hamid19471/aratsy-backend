@@ -19,7 +19,7 @@ export class UserEntity {
   @Column({ length: 100, unique: true })
   email: string;
 
-  @Column({ length: 100, nullable: false, select: false })
+  @Column({ length: 100, nullable: false })
   password: string;
 
   @Column({ default: true })

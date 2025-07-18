@@ -42,7 +42,18 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.userRepository.find();
+    const users = await this.userRepository.find();
+    return users.map((user) => {
+      return {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      };
+    });
   }
 
   async findOne(id: number) {
