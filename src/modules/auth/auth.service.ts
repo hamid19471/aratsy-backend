@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entities/user.entity';
@@ -11,7 +12,7 @@ import { ErrorMessage } from 'src/enums/error-message.enum';
 import * as bcrypt from 'bcrypt';
 import { TokenService } from './token.service';
 import { TokenPayload } from 'src/types/token-payload.type';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SuccessMessage } from 'src/enums/success-message.enum';
 
 @Injectable()
@@ -62,5 +63,30 @@ export class AuthService {
     return {
       message: SuccessMessage.USER_CREATED,
     };
+  }
+
+  async refreshToken(req: Request, res: Response) {
+    const token = req.cookies['refresh_token'] as string;
+    if (!token) {
+      throw new UnauthorizedException(ErrorMessage.INVALID_REFRESH_TOKEN);
+    }
+    const { email, full_name, role } =
+      this.tokenService.verifyRefreshToken(token);
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException(ErrorMessage.USER_NOT_FOUND);
+    }
+    const access_token = this.tokenService.generateAccessToken({
+      email,
+      full_name,
+      role,
+    });
+    const refresh_token = this.tokenService.generateRefreshToken({
+      email,
+      full_name,
+      role,
+    });
+    this.tokenService.setCookie(res, access_token, refresh_token);
+    res.json();
   }
 }

@@ -1,9 +1,9 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { SwaggerConsumer } from 'src/enums/swagger-consumer.enum';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -19,5 +19,10 @@ export class AuthController {
   @ApiConsumes(SwaggerConsumer.X_WWW_FORM_URLENCODED, SwaggerConsumer.JSON)
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Post('refresh-token')
+  refreshToken(@Req() req: Request, @Res() res: Response) {
+    return this.authService.refreshToken(req, res);
   }
 }
