@@ -1,5 +1,5 @@
 import { EntityName } from 'src/enums/entity-name.enum';
-import { Role } from 'src/enums/role.enum';
+import { Roles } from 'src/enums/role.enum';
 import {
   Column,
   CreateDateColumn,
@@ -25,8 +25,8 @@ export class UserEntity {
   @Column({ default: true })
   is_active: boolean;
 
-  @Column({ default: Role.USER })
-  role: string;
+  @Column({ default: Roles.USER })
+  role: Roles;
 
   @CreateDateColumn()
   created_at: Date;

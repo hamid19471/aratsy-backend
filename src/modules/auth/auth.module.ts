@@ -10,5 +10,6 @@ import { TokenService } from './token.service';
   imports: [TypeOrmModule.forFeature([UserEntity]), JwtModule],
   controllers: [AuthController],
   providers: [AuthService, JwtService, TokenService],
+  exports: [AuthService, JwtService, TokenService],
 })
 export class AuthModule {}

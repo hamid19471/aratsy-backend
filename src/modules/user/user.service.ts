@@ -9,9 +9,9 @@ import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorMessage } from 'src/enums/error-message.enum';
-import { Role } from 'src/enums/role.enum';
-import * as bcrypt from 'bcrypt';
+import { Roles } from 'src/enums/role.enum';
 import { SuccessMessage } from 'src/enums/success-message.enum';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -30,7 +30,7 @@ export class UserService {
       email,
       full_name,
       password: hashedPassword,
-      role: role ?? Role.USER,
+      role: role ?? Roles.USER,
       is_active: true,
     });
 
