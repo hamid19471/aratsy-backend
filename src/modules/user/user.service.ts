@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  Scope,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,13 +14,56 @@ import { ErrorMessage } from 'src/enums/error-message.enum';
 import { Roles } from 'src/enums/role.enum';
 import { SuccessMessage } from 'src/enums/success-message.enum';
 import * as bcrypt from 'bcrypt';
+import { ProfileEntity } from './entities/profile.entity';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
+import { ProfileDto } from './dto/profile.dto';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(ProfileEntity)
+    private profileRepository: Repository<ProfileEntity>,
+    @Inject(REQUEST)
+    private readonly request: Request,
   ) {}
+
+  async createProfile(profileDto: ProfileDto) {
+    const { id: userId, profileId } = this.request.user as UserEntity;
+    const { email, full_name, mobile, role } = profileDto;
+    let profile = await this.profileRepository.findOneBy({ userId });
+    if (profile) {
+      if (email) {
+        profile.email = email;
+      }
+      if (full_name) {
+        profile.full_name = full_name;
+      }
+      if (mobile) {
+        profile.mobile = mobile;
+      }
+      if (role) {
+        profile.role = role;
+      }
+      await this.profileRepository.save(profile);
+    } else {
+      profile = this.profileRepository.create({
+        email,
+        full_name,
+        mobile,
+        role,
+      });
+    }
+    if (!profileId) {
+      await this.userRepository.update(
+        { id: userId },
+        { profileId: profile?.id },
+      );
+    }
+  }
+
   async create(createUserDto: CreateUserDto) {
     const { email, password, role, full_name } = createUserDto;
     const findUser = await this.findByEmail(email);

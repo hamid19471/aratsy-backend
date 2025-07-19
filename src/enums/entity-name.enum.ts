@@ -3,4 +3,5 @@ export enum EntityName {
   ADMIN = 'admin',
   POST = 'post',
   CATEGORY = 'category',
+  PROFILE = 'profile',
 }

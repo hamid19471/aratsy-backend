@@ -14,12 +14,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { SwaggerConsumer } from 'src/enums/swagger-consumer.enum';
 import { AuthGuard } from 'src/guards/auth.gurd';
+import { ProfileDto } from './dto/profile.dto';
 
 @Controller('user')
 @ApiTags('User')
 @UseGuards(AuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('profile')
+  @ApiConsumes(SwaggerConsumer.X_WWW_FORM_URLENCODED, SwaggerConsumer.JSON)
+  createProfile(@Body() profileDto: ProfileDto) {
+    return this.userService.createProfile(profileDto);
+  }
 
   @Post()
   @ApiConsumes(SwaggerConsumer.X_WWW_FORM_URLENCODED, SwaggerConsumer.JSON)

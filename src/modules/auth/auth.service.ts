@@ -14,12 +14,15 @@ import { TokenService } from './token.service';
 import { TokenPayload } from 'src/types/token-payload.type';
 import { Request, Response } from 'express';
 import { SuccessMessage } from 'src/enums/success-message.enum';
+import { ProfileEntity } from '../user/entities/profile.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(ProfileEntity)
+    private profileRepository: Repository<ProfileEntity>,
     private tokenService: TokenService,
   ) {}
 
@@ -60,6 +63,16 @@ export class AuthService {
       password: hashedPassword,
     });
     await this.userRepository.save(newUser);
+    const profile = this.profileRepository.create({
+      email,
+      full_name,
+      userId: newUser.id,
+    });
+    await this.profileRepository.save(profile);
+    await this.userRepository.update(
+      { id: newUser.id },
+      { profileId: profile.id },
+    );
     return {
       message: SuccessMessage.USER_CREATED,
     };

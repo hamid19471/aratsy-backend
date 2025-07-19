@@ -4,9 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ProfileEntity } from './profile.entity';
 
 @Entity(EntityName.USER)
 export class UserEntity {
@@ -27,6 +30,13 @@ export class UserEntity {
 
   @Column({ default: Roles.USER })
   role: Roles;
+
+  @Column({ nullable: true })
+  profileId: number;
+
+  @OneToOne(() => ProfileEntity, (profile) => profile.user)
+  @JoinColumn()
+  profile: ProfileEntity;
 
   @CreateDateColumn()
   created_at: Date;
