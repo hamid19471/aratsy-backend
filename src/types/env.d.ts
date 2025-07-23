@@ -9,5 +9,7 @@ namespace NodeJS {
     DB_PORT: number;
     ACCESS_TOKEN_SECRET_KEY: string;
     REFRESH_TOKEN_SECRET_KEY: string;
+    REDIS_HOST: string;
+    REDIS_PORT: string;
   }
 }

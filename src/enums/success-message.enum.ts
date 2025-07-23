@@ -7,4 +7,5 @@ export enum SuccessMessage {
   CATEGORY_CREATED = 'دسته بندی با موفقیت ساخته شد',
   CATEGORY_REMOVED = 'دسته بندی با موفقیت حذف شد',
   CATEGORY_UPDATED = 'دسته بندی با موفقیت به روز شد',
+  PROFILE_CREATED = 'پروفایل با موفقیت بروز شد',
 }

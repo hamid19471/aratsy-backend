@@ -87,7 +87,11 @@ export class UserService {
   }
 
   async findAll() {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: {
+        profile: true,
+      },
+    });
     return users.map((user) => {
       return {
         id: user.id,
@@ -97,6 +101,7 @@ export class UserService {
         is_active: user.is_active,
         created_at: user.created_at,
         updated_at: user.updated_at,
+        profile: user.profile,
       };
     });
   }
