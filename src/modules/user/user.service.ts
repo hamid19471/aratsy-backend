@@ -18,6 +18,7 @@ import { ProfileEntity } from './entities/profile.entity';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
 import { ProfileDto } from './dto/profile.dto';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UserService {
@@ -28,6 +29,7 @@ export class UserService {
     private profileRepository: Repository<ProfileEntity>,
     @Inject(REQUEST)
     private readonly request: Request,
+    private cacheService: CacheService,
   ) {}
 
   async createProfile(profileDto: ProfileDto) {
@@ -87,30 +89,41 @@ export class UserService {
   }
 
   async findAll() {
-    const users = await this.userRepository.find({
+    const cacheKey = 'users';
+    let cachedUsers = await this.cacheService.get<UserEntity[]>(cacheKey);
+    if (cachedUsers) {
+      console.log('come from cache');
+      return cachedUsers;
+    }
+    if (!cachedUsers) {
+      console.log('come from cache');
+      cachedUsers = await this.userRepository.find({
+        relations: {
+          profile: true,
+        },
+      });
+      await this.cacheService.set<UserEntity[]>(cacheKey, cachedUsers, '2h');
+    }
+    return cachedUsers;
+  }
+
+  async findOne(id: number) {
+    const cacheKey = `user-${id}`;
+    const cachedUser = await this.cacheService.get<UserEntity>(cacheKey);
+    if (cachedUser) {
+      console.log('come from cache');
+      return cachedUser;
+    }
+    const user = await this.userRepository.findOne({
+      where: { id },
       relations: {
         profile: true,
       },
     });
-    return users.map((user) => {
-      return {
-        id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        role: user.role,
-        is_active: user.is_active,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-        profile: user.profile,
-      };
-    });
-  }
-
-  async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID);
     }
+    await this.cacheService.set(cacheKey, user, '2h');
     return user;
   }
 

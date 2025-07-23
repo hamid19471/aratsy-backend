@@ -6,11 +6,13 @@ import { UserEntity } from './entities/user.entity';
 import { TokenService } from '../auth/token.service';
 import { JwtService } from '@nestjs/jwt';
 import { ProfileEntity } from './entities/profile.entity';
+import { CacheService } from '../cache/cache.service';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, ProfileEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, ProfileEntity]), CacheModule],
   controllers: [UserController],
-  providers: [UserService, TokenService, JwtService],
-  exports: [UserService, TokenService, JwtService],
+  providers: [UserService, TokenService, JwtService, CacheService],
+  exports: [UserService, TokenService, JwtService, CacheService],
 })
 export class UserModule {}

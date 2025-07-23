@@ -6,6 +6,7 @@ import { join } from 'path';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategorisModule } from './modules/categoris/categoris.module';
+import { CacheModule } from './modules/cache/cache.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CategorisModule } from './modules/categoris/categoris.module';
     UserModule,
     AuthModule,
     CategorisModule,
+    CacheModule,
   ],
   controllers: [],
   providers: [],
