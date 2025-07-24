@@ -8,4 +8,5 @@ export enum ErrorMessage {
   FORBIDDEN = 'شما دسترسی به این سرویس ندارید',
   CATEGORY_ALREADY_EXISTS = 'دسته بندی با این عنوان قبلا ثبت شده است',
   CATEGORY_NOT_FOUND = 'دسته بندی با این شناسه یافت نشد',
+  BLOG_ALREADY_EXISTS = 'بلاگ با این عنوان قبلا ثبت شده است',
 }
