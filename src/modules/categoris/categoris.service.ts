@@ -12,12 +12,14 @@ import { ErrorMessage } from 'src/enums/error-message.enum';
 import { SuccessMessage } from 'src/enums/success-message.enum';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationSolver } from 'src/common/pagination/utils/pagination.util';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class CategorisService {
   constructor(
     @InjectRepository(CategorisEntity)
     private categoriesRepository: Repository<CategorisEntity>,
+    private cacheService: CacheService,
   ) {}
 
   async create(createCategorisDto: CreateCategorisDto) {
@@ -37,6 +39,13 @@ export class CategorisService {
   }
 
   async findAll(paginationQueryDto: PaginationQueryDto) {
+    const cacheKey = 'categories';
+    const cachedCategories =
+      await this.cacheService.get<CategorisEntity[]>(cacheKey);
+    if (cachedCategories) {
+      console.log('come from cache');
+      return cachedCategories;
+    }
     const { page, limit, skip } = PaginationSolver(paginationQueryDto);
     const [categories, totalItems] =
       await this.categoriesRepository.findAndCount({
@@ -47,7 +56,7 @@ export class CategorisService {
           created_at: 'DESC',
         },
       });
-    return {
+    const result = {
       pagination: {
         page,
         limit,
@@ -56,13 +65,23 @@ export class CategorisService {
       },
       data: categories,
     };
+    await this.cacheService.set(cacheKey, result, '2h');
+    return result;
   }
 
   async findAllSlugs() {
+    const cacheKey = 'categories-slugs';
+    const cachedSlugs = await this.cacheService.get<string[]>(cacheKey);
+    if (cachedSlugs) {
+      console.log('come from cache');
+      return cachedSlugs;
+    }
     const slugs = await this.categoriesRepository.find({
       select: ['slug'],
     });
-    return slugs.map((slug) => slug.slug);
+    const result = slugs.map((slug) => slug.slug);
+    await this.cacheService.set(cacheKey, result, '2h');
+    return result;
   }
 
   async findOne(id: number) {
