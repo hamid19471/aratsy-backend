@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CategorisService } from './categoris.service';
 import { CreateCategorisDto } from './dto/create-categoris.dto';
@@ -14,6 +15,8 @@ import { UpdateCategorisDto } from './dto/update-categoris.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guards/auth.gurd';
 import { SwaggerConsumer } from 'src/enums/swagger-consumer.enum';
+import { Pagination } from 'src/common/pagination/decorators/pagination.decorator';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 
 @Controller('categoris')
 @ApiTags('Categoris')
@@ -28,8 +31,9 @@ export class CategorisController {
   }
 
   @Get()
-  findAll() {
-    return this.categorisService.findAll();
+  @Pagination()
+  findAll(@Query() paginationQueryDto: PaginationQueryDto) {
+    return this.categorisService.findAll(paginationQueryDto);
   }
 
   @Get('slugs')

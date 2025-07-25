@@ -10,6 +10,8 @@ import { CategorisEntity } from './entities/categoris.entity';
 import { Repository } from 'typeorm';
 import { ErrorMessage } from 'src/enums/error-message.enum';
 import { SuccessMessage } from 'src/enums/success-message.enum';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { PaginationSolver } from 'src/common/pagination/utils/pagination.util';
 
 @Injectable()
 export class CategorisService {
@@ -34,8 +36,26 @@ export class CategorisService {
     };
   }
 
-  async findAll() {
-    return this.categoriesRepository.find();
+  async findAll(paginationQueryDto: PaginationQueryDto) {
+    const { page, limit, skip } = PaginationSolver(paginationQueryDto);
+    const [categories, totalItems] =
+      await this.categoriesRepository.findAndCount({
+        where: {},
+        skip,
+        take: limit,
+        order: {
+          created_at: 'DESC',
+        },
+      });
+    return {
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+      },
+      data: categories,
+    };
   }
 
   async findAllSlugs() {
