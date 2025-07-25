@@ -7,6 +7,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategorisModule } from './modules/categoris/categoris.module';
 import { CacheModule } from './modules/cache/cache.module';
+import { BlogModule } from './modules/blog/blog.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CacheModule } from './modules/cache/cache.module';
     AuthModule,
     CategorisModule,
     CacheModule,
+    BlogModule,
   ],
   controllers: [],
   providers: [],
